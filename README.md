@@ -188,8 +188,10 @@ It should now have a valid TLS certificate
 
 Expore the various Operators available.  I've deployed the AWX operator
 
-!["AWX Operator](./images/awx-operator.png)
+!["AWX Operator"](./images/awx-operator.png)
 
 Through that, I can use the various APIs that operator provides to deploy something.  In my case, I've already created an "AWX" instance.
 
-I've exposed this via an ingress controller and have a Lets Encrypt certificate on it.
+I've exposed this via an ingress controller and have a Lets Encrypt certificate on it.  Let's take a look at some of what this particular operator exposes through the console like:
+- setting passwords and other properties of the instance
+- setting the hostname
