@@ -182,3 +182,14 @@ In Azure DNS or other DNS provider, create an A record with that IP address
 8. Visit your app
 
 It should now have a valid TLS certificate
+
+
+## Operators
+
+Expore the various Operators available.  I've deployed the AWX operator
+
+!["AWX Operator](./images/awx-operator.png)
+
+Through that, I can use the various APIs that operator provides to deploy something.  In my case, I've already created an "AWX" instance.
+
+I've exposed this via an ingress controller and have a Lets Encrypt certificate on it.
