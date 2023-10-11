@@ -64,6 +64,16 @@ If you were to try `oc port-forward svc/rating-api 8080:8080` and then tried to 
 
 Note the different strategy here.  If you look in the repo, it contains a Dockerfile
 
-3. 
+3. Set the environment variable so rating-web knows where the API is
 
+`oc set env deploy rating-web API=http://rating-api:3000`
 
+4. Expose the rating-web service
+
+`oc expose svc/rating-web`
+
+5. Verify the ratings app is accessible
+
+Note that in the topology view, it's now possible to go to the app via the exposed route
+
+![Expose Web Route](./images/rating-web-open-url.png "Expose Web Route")
