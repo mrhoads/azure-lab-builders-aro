@@ -11,3 +11,5 @@
 - described in MSFT [docs](https://learn.microsoft.com/en-us/azure/openshift/configure-azure-ad-ui)
 - make your user a cluster-admin through a ClusterRoleBinding
 - you've done it correctly if you can login and see the administrator view (like you would as kubeadmin)
+
+![Cluster Role Binding](./images/aad-clusterrolebinding.png "Cluster Role Binding")
