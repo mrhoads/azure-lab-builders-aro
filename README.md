@@ -5,6 +5,7 @@
 - [Red Hat Cloud Experts](https://cloud.redhat.com/experts/)
 - [Azure Front Door with ARO](https://cloud.redhat.com/experts/aro/frontdoor/)
 - [Azure Arc with ARO](https://cloud.redhat.com/experts/aro/azure-arc-integration/)
+- get your [pull secret](https://console.redhat.com/openshift/install/azure/aro-provisioned)
 
 ## AAD Integration with ARO
 
@@ -63,6 +64,14 @@ If you were to try `oc port-forward svc/rating-api 8080:8080` and then tried to 
 2. Deploy rating-web with `oc new-app https://github.com/mrhoads/azure-lab-builders-openshift-ratings-web --strategy=docker --name=rating-web`
 
 Note the different strategy here.  If you look in the repo, it contains a Dockerfile
+
+Consider looking at setting up a webhook to trigger builds when changes are made to GitHub.  Run:
+`oc get bc/rating-web -o=jsonpath='{.spec.triggers..github.secret}'` to get the secret value and...
+`oc describe bc/rating-web` to get the webhook URL
+
+Then configure that webhook in your GitHub repo, being sure to set the content type to *application/json*
+
+Make a commit and look for a new build.
 
 3. Set the environment variable so rating-web knows where the API is
 
@@ -195,3 +204,60 @@ Through that, I can use the various APIs that operator provides to deploy someth
 I've exposed this via an ingress controller and have a Lets Encrypt certificate on it.  Let's take a look at some of what this particular operator exposes through the console like:
 - setting passwords and other properties of the instance
 - setting the hostname
+
+## Using Log Analytics with ARO
+
+The following section is based on what Red Hat GBBs [describe here](https://cloud.redhat.com/experts/aro/clf-to-azure/)
+
+1. I've already created a Log Analytics Workspace and need the key and workspace ID from it:
+
+```
+WORKSPACE_ID=$(az monitor log-analytics workspace show \
+ -g <RG> -n <Workspace Name> \
+ --query customerId -o tsv)
+ ```
+
+ ```
+ SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys \
+ -g <RG> -n <Workspace Name> \
+ --query primarySharedKey -o tsv)
+ ```
+
+2. Create a new project
+
+`oc project aro-clf-am`
+
+3. Create new namespaces
+
+```
+kubectl create ns openshift-logging
+kubectl create ns openshift-operators-redhat
+```
+
+4. Add the appropriate Helm repo
+
+`helm repo add mobb https://rh-mobb.github.io/helm-charts/`
+ 
+ 5. Update Helm repos
+
+ `helm repo update`
+
+ 6. Deploy Elasticsearch Operators
+
+ ```
+ helm upgrade -n $NAMESPACE clf-operators \
+ mobb/operatorhub --version 0.1.1 --install \
+ --values https://raw.githubusercontent.com/rh-mobb/helm-charts/main/charts/aro-clf-am/files/operators.yaml
+```
+
+7. Deploy the Custom Log Forwarder
+
+```
+helm upgrade -n $NAMESPACE clf \
+ mobb/aro-clf-am --install \
+ --set "azure.workspaceId=$WORKSPACE_ID" --set "azure.sharedKey=$SHARED_KEY"
+```
+
+8. Wait!
+
+In ~10 minutes you should see a new table, *openshift_CL*, in your workspace.
