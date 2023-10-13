@@ -31,7 +31,7 @@ oc new-app bitnami/mongodb \
   -e MONGODB_ROOT_PASSWORD=ratingspassword
 ```
 
-3. Our service will be at "mongodb.<project name>.svc.cluster.local"
+3. Our service will be at "mongodb.PROJECT-NAME.svc.cluster.local"
 
 ### Deploy the Ratings API
 
@@ -213,13 +213,13 @@ The following section is based on what Red Hat GBBs [describe here](https://clou
 
 ```
 WORKSPACE_ID=$(az monitor log-analytics workspace show \
- -g <RG> -n <Workspace Name> \
+ -g demo-alb-aro-rg -n alb20231012 \
  --query customerId -o tsv)
  ```
 
  ```
  SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys \
- -g <RG> -n <Workspace Name> \
+ -g demo-alb-aro-rg -n alb20231012 \
  --query primarySharedKey -o tsv)
  ```
 
